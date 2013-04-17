@@ -58,14 +58,27 @@ html, body{
 								   "current latitude      :"+current_latitude+"\n"+
 								   "post message          :"+PostMessage;
 				alert(temp_outputStr);
-				distanceBetweenTwoPoint(current_longitude,current_latitude,-88.22025,40.09988);
+				distanceBetweenTwoPoint(current_longitude,current_latitude,-88.22002969204378,40.0998408460058);
 			}
 			
 			var distanceBetweenTwoPoint=function(lon1,lat1,lon2,lat2){
-				var R = 6371000; // m
+			/*
+				var R = 6371; // km
 				var d = Math.acos(Math.sin(lat1)*Math.sin(lat2) + 
                   Math.cos(lat1)*Math.cos(lat2) *
                   Math.cos(lon2-lon1)) * R;			
+                  */
+                  	// need to change to Radians to pass to trig func
+                    var R = 6371000; // m
+				    var dLat = (lat2-lat1)*Math.PI/180;
+					var dLon = (lon2-lon1)*Math.PI/180;
+					var lat1 = lat1*Math.PI/180;
+					var lat2 = lat2*Math.PI/180;
+					
+					var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+					        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+					var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+					var d = R * c;
                   
                 alert("Distance---->"+d);
 			}
@@ -89,6 +102,8 @@ html, body{
 			"altitudeAccuracy:"+ pos.coords.altitudeAccuracy +"<br>"+
 			"heading:"+ pos.coords.heading +"<br>"+
 			"speed:"+ pos.coords.speed +"";	
+			
+			//alert(walley_geolocation_outputStr);
 			
 	    walley_geolocation=new Array();
 		walley_geolocation["latitude"]=pos.coords.latitude;
@@ -124,11 +139,19 @@ html, body{
 				
 		}
 		
+		var errorLocation=function(){
+			alert("Can not locate!");
+		}
+		
+		var optionLocation={
+		enableHighAccuracy:true
+		};
+		
 		var getLocation=function()
 				  {
 				  if (navigator.geolocation)
 					{
-					navigator.geolocation.watchPosition(showPosition);
+					navigator.geolocation.watchPosition(showPosition,errorLocation,optionLocation);
 					}
 				  else{
 					  alert("Geolocation is not supported by this browser.");
