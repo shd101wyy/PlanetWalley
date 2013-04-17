@@ -1,25 +1,6 @@
 <html>
 <style type="text/css">
-#apDiv1 {
-	position: absolute;
-	width: 107px;
-	height: 103px;
-	z-index: 1;
-	left: 162px;
-	top: 23px;
-}
-#apDiv2 {
-	position: absolute;
-	width: 285px;
-	height: 182px;
-	z-index: 2;
-}
-#apDiv3 {
-	position: absolute;
-	width: 155px;
-	height: 181px;
-	z-index: 3;
-}
+
 html, body{
 	width:100%;
 	height:100%;
@@ -30,42 +11,70 @@ html, body{
 </style>
 <head>
   <title> AR CONTENT </title>
-  <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
     
         <!-- Metro UI CSS -->
         <link href="../metro_ui_css/css/modern.css" rel="stylesheet" type="text/css">
         <link href="../metro_ui_css/css/modern-responsive.css" rel="stylesheet" type="text/css">
         <link href="../metro_ui_css/css/theme-dark.css" rel="stylesheet" type="text/css">
         </style>
-  <script type="text/javascript" src="../metro_ui_css/javascript/accordion.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/buttonset.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/carousel.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/dropdown.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/input-control.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/pagecontrol.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/rating.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/slider.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/tile-drag.js"></script>
-  <script type="text/javascript" src="../metro_ui_css/javascript/tile-slider.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/accordion.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/buttonset.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/carousel.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/dropdown.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/input-control.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/pagecontrol.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/rating.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/slider.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/tile-drag.js"></script>
+<script type="text/javascript" src="../metro_ui_css/javascript/tile-slider.js"></script>
+        
+<script type="text/javascript"	src="./three.js"></script>
+<script type="text/javascript"	src="./jquery.min.js"></script>
         
 </head>
-<body id="body1" onLoad="getLocation()"  style="background:transparent;">
-	<h1 style="color:#F96"> Post It </h1>
-    
-
-
-<div id="apDiv2" class="tile" style="background-color:#39F;">
-  <div id="apDiv1">
-            <p id="location_information" style="font-size:9px;color:#FFF;">location info</p>
-        </div>
-  <div id="apDiv3">
-  	 <p>&nbsp;</p>
- 	 <div id="mapholder" style="width:150px;height:150px;" ></div>
-  </div>
-
-
-</div>
-<script>
+<body onLoad="getLocation()"  style="background:transparent;; opacity:0.8;">
+            
+		<div style=" height:100%; widows:95%; left:2%; top:0%;">
+        	 <div id="three_div" style="width:50%;height:100%; background:transparent ; position:absolute;top:0%;left:10%;" >
+    		 </div>
+             <div style="position:absolute;top:2%;left:2%;height:20%;width:20%;" id="mapholder">
+		  	 	
+		 	 </div>
+		     <p id="location_information" style="font-size:100%;color:#000;left:25%; top:2%;width:20%;height:20%; position:absolute;";>location info</p>
+		     
+		     <input id="postit" type="text" style="position:absolute; width:60%; height:5%; top:80%;left:5%;">
+		     <button style="position:absolute; width 20%;height:5%; top:80%;left:70%" onclick="PostIt()">Post It !</button>
+		   
+            
+		</div>
+		<script>
+			// Post It function
+			var PostIt=function(){
+			
+				var PostMessage=document.getElementById("postit").value;
+				
+				var temp_outputStr="current longitude     :"+current_longitude+"\n"+
+								   "current latitude      :"+current_latitude+"\n"+
+								   "post message          :"+PostMessage;
+				alert(temp_outputStr);
+				distanceBetweenTwoPoint(current_longitude,current_latitude,-88.22025,40.09988);
+			}
+			
+			var distanceBetweenTwoPoint=function(lon1,lat1,lon2,lat2){
+				var R = 6371000; // m
+				var d = Math.acos(Math.sin(lat1)*Math.sin(lat2) + 
+                  Math.cos(lat1)*Math.cos(lat2) *
+                  Math.cos(lon2-lon1)) * R;			
+                  
+                alert("Distance---->"+d);
+			}
+			
+			
+		</script>
+		<script>
+		var current_longitude=0;
+		var current_latitude=0;
 		var location_info=document.getElementById("location_information");
 		var walley_geolocation=[];
 		var walley_geolocation_outputStr="";
@@ -92,6 +101,8 @@ html, body{
 				
 		location_info.innerHTML=walley_geolocation_outputStr;
 		
+		current_longitude=pos.coords.longitude;
+		current_latitude=pos.coords.latitude;
 		
 		// google map
 		lat=pos.coords.latitude;
@@ -128,6 +139,8 @@ html, body{
 	var body=document.getElementById("body1");
 	body.requestFullScreen();
 	</script>
+	<script type="text/javascript"  src="./my3d.js"></script>
+
 </body>
 
 </html>
