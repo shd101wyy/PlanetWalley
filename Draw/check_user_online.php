@@ -10,13 +10,14 @@
 	$piece=explode("\n", $content_in_file);
 	$i=0;
 	$length_of_piece=count($piece);
-	for($i=0;$i<$length_of_piece;$i++){
-		if($piece[$i]==$user_name){
-			$same_online=true;
-			break;
-		}
-	}	
-	
+	if($length_of_piece!=0){
+		for($i=0;$i<$length_of_piece;$i++){
+			if($piece[$i]==$user_name){
+				$same_online=true;
+				break;
+			}
+		}	
+	}
 	$return_array=array();
 	array_push($return_array, $same_online);
 	

@@ -19,8 +19,12 @@
         
         <!-- JQuery -->
         <script type="text/javascript"	src="../jquery.min.js"></script>
+        <script type="text/javascript"	src="../jquery.cookie.js"></script>
+
 	</head>
 	<body>
+					
+
 		<style type="text/css">
 		
 			html, body{
@@ -67,9 +71,7 @@
 			
 			<div id="chat_information">
 				<h2> Chat Information </h2>
-				
-				
-            	
+							            	
             		<!--
 					<h4> &nbsp;&nbsp;&nbsp;&nbsp; user name </h4>
 					<input id="name"> -->
@@ -83,36 +85,48 @@
 							
 				            		$has_login=true;
 							
-							
+				            		$judge="true";
 				            	}
 				            	else{
-									
+									$judge="false";
 					            }
 					            
-			            		// has_login
-			            		if($has_login){
-			            			echo '<h3 id="welcome" name="welcome"> Welcome Guest ! </h3>';
-			            			echo '<button id="sign_out">sign out</button>';
-			            			echo "<script>";
-			            			echo $to_run;
-			            			echo "var custom_name=".$_COOKIE["user_name"];
-			            			echo "</script>";
-			            		}
-			            		// guest mode
-			            		else{
-				            		echo '<button id="sign_up">sign up</button>';
-				            		echo '<button id="login">login</button>';
-				            		echo '<label id="welcome" name="welcome"> Welcome Guest ! </label>';
-			
-				            		echo '<script>';
-				            		echo 'var custom_name = prompt("Enter your chat name:", "Guest");';
-				            		$temp='$("#welcome").html("Welcome "+custom_name+" !")';
-				            		echo $temp;
-				            		echo '</script>';
-			            		}
+					           	
+	
+				            		// has_login
+				            		if($has_login){
+				            			echo '<h3 id="welcome" name="welcome"> Welcome Guest ! </h3>';
+				            			echo '<button id="sign_out">sign out</button>';
+				            			echo "<script>";
+				            			echo $to_run;
+				            			echo "var custom_name=".$_COOKIE["user_name"];
+				            			echo "</script>";
+				            		}
+				            		// guest mode
+				            		else{
+				            			
+					            		echo '<button id="sign_up">sign up</button>';
+					            		echo '<button id="login">login</button>';
+					            		echo '<button id="sign_out">quit</button>';
+					            		echo '<label id="welcome" name="welcome"> Welcome Guest ! </label>';
+				
+					            		echo '<script>';
+					            		// temp_user_name existed
+					            		if (isset($_COOKIE["temp_user_name"])){
+					            			echo 'var custom_name ='.$_COOKIE["temp_user_name"];
+					            			$judge="true";
+					            		}
+					            		else{
+					            			echo 'var custom_name = prompt("Enter your chat name:", "Guest");';
+					            		}
+					            		$temp='$("#welcome").html("Welcome "+custom_name+" !")';
+					            		echo $temp;
+					            		echo '</script>';
+				            		}
+			            		
 			            	
 			            	?>
-
+			            	<h4 id="online_num"> Online: 0 </h4>
 		     				<h4> &nbsp;&nbsp;&nbsp;&nbsp; send message </h4>
 							<input name="postit" id="postit" type="text">
 							<input type="submit" value="Send Message" id="submit">
@@ -128,9 +142,19 @@
 		
 		
 		<script type="text/javascript">
+
+			// check whether is_walley_user
+			var is_walley_user= "<?php echo $judge ?>";
+			if(is_walley_user=="true"){
+				is_walley_user=true;
+			}
+			else{
+				is_walley_user=false;
+			}
 		
 			
 			// save user name to room
+			// and set cookie
 			var Save_User_Name=function(){
 				
 					// load user name to public_room_now_online_user.txt
@@ -144,7 +168,7 @@
 							//alert("Successfully init");
 						},
 						error:function(){
-							alert("Error");
+							alert("Error.. Cannot save user name");
 						}
 					}
 				);
@@ -162,18 +186,24 @@
 						success: function(data){
 							var same_online=data[0];
 							if(same_online){
-								alert("Same User Name already Online");
-								window.location.reload();							}
+								//alert("Same User Name already Online");
+								return true;
+							}
+							else{
+								return false;
+							}
 						},
 						error:function(){
-							alert("Error");
+							alert("Error.. Cannot judge whether same user exist");
+							return true;
 						}
 					}
 				);
 			};
 			
-			// remove user and make he/her online
 			
+			
+			// remove user and make he/her online
 			var Remove_User_Online=function(user_name){
 				// check whether same user online
 				$.ajax(
@@ -184,23 +214,33 @@
 						dataType: 'json',
 						success: function(data){
 							alert("Successfully logout");
+							window.location.href="../index.php";
 						},
 						error:function(){
 							alert("Error.. Cannot remove online user");
+							
 						}
 					}
 				);
 			}
 			
-			Check_Same_User_Online(custom_name);
-			Save_User_Name();
-				
+			
+			
+			
+			if(is_walley_user==false){
+				if(!Check_Same_User_Online(custom_name)){
+					Save_User_Name();
+				}
+				else{
+					alert("Same User Name already Online");
+					window.location.reload();
+				}
+			}
+			else{
+			}
 					
 			
-			window.onbeforeunload = function() {
-				Remove_User_Online(custom_name);
-				alert("You are now offline.");
-        	};
+			
         	
 			
 			$(function(){
@@ -223,6 +263,8 @@
 							
 							var chat_content=data[0];
 							
+							var online_num_string="Online: "+data[1];
+							$("#online_num").html(online_num_string);
 							// new content
 							if(previous_chat_content!=chat_content){
 								$("#chat_area").html(chat_content);
@@ -253,11 +295,17 @@
 			});
 			
 			$("#sign_up").click(function(){
-	    	window.location.href='../sign_up.html';
+	    		window.location.href='../sign_up.html';
 	    	});
 	    	
 	    	$("#sign_out").click(function(){
-		    	window.location.href="../User_Data/sign_out.php";
+		    	//window.location.href="../User_Data/sign_out.php";
+		        document.cookie = "temp_user_name" + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+		        document.cookie = "user_name" + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+		        
+				alert("You are now offline.");
+		        Remove_User_Online(custom_name);
+		        
 	    	});
 	    	
 	    	

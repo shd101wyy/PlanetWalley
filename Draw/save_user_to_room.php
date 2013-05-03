@@ -9,6 +9,7 @@
 	$new_content.="\n";
 	file_put_contents($room_name, $new_content);
 	
+	setcookie("temp_user_name",$user_name,time()+60*60);
 	
 	echo json_encode(null);
 ?>
