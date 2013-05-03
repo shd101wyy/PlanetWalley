@@ -43,11 +43,30 @@ html, body{
 		 	 </div>
 		     <p id="location_information" style="font-size:100%;color:#000;left:25%; top:2%;width:20%;height:20%; position:absolute;";>location info</p>
 		     
-		     <input id="postit" type="text" style="position:absolute; width:60%; height:5%; top:80%;left:5%;">
-		     <button style="position:absolute; width 20%;height:5%; top:80%;left:70%" onclick="PostIt()">Post It !</button>
-		   
+		     
+		     
+		     <form action="./data_upload.php" method="post" target="upload_check_iframe">
+		     
+		     <input name="postit" id="postit" type="text" style="position:absolute; width:60%; height:5%; top:80%;left:5%;">
+		     <input type="submit" style="position:absolute; width 20%;height:5%; top:80%;left:70%" onclick="PostIt()" value="Post It!" >
+		     
+		     
+		     <input type="text" style="visibility:hidden" name="saved_latitude" id="saved_latitude" value="0">
+		     <input type="text" style="visibility:hidden" name="saved_longitude" id="saved_longitude" value="0">
+
+		     
+		     </form>
+		     
+		     <iframe name="upload_check_iframe" style="position:absolute; top:40%; left:40%; width:20%; height:20%">
+				     
+		     
+		     </iframe>
+		     
+
+	
             
 		</div>
+		
 		<script>
 			// Post It function
 			var PostIt=function(){
@@ -114,6 +133,8 @@ html, body{
 		walley_geolocation["heading"]=pos.coords.heading;
 		walley_geolocation["speed"]=pos.coords.speed;
 				
+		document.getElementById("saved_latitude").value=pos.coords.latitude;
+		document.getElementById("saved_longitude").value=pos.coords.longitude;
 		location_info.innerHTML=walley_geolocation_outputStr;
 		
 		current_longitude=pos.coords.longitude;

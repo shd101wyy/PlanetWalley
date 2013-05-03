@@ -1,5 +1,4 @@
      // Our Javascript will go here. 
-     		alert("RUN my3d")
             function myKeyPress(evt){
 
                evt = evt || window.event;
@@ -22,11 +21,12 @@
 		  	var HEIGHT=$("#three_div").height();
 		  
             var camera=new THREE.PerspectiveCamera(
-                75,
+                45,
                 WIDTH/HEIGHT,
                 0.1,
-                1000
+                2000
                 );
+            camera.position.set(50,50,50);
             camera.lookAt(new THREE.Vector3(0,0,0));
             
             var renderer = new THREE.WebGLRenderer();
@@ -35,7 +35,20 @@
             var $three_div=$("#three_div");
             $three_div.append(renderer.domElement);
             
-            var geometry = new THREE.CubeGeometry(1,1,1);
+            
+            // plane
+            // Plane
+
+				var material = new THREE.MeshDepthMaterial( { side: THREE.DoubleSide, overdraw: true } );
+
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
+				plane.position.y = - 100;
+				plane.rotation.x = - Math.PI / 2;
+				scene.add( plane );
+
+            
+            // cube
+            var geometry = new THREE.CubeGeometry(2,2,2);
             var material = new THREE.MeshBasicMaterial( { color: 0x00ff10 } ); 
             var cube = new THREE.Mesh( geometry, material ); 
             scene.add( cube );
