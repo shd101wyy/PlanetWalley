@@ -82,7 +82,7 @@
   	setcookie("password", $hashed_password, time()+60*60*24*3,'/' );
   	
   	print_r($_COOKIE);
-  	echo "<script>alert('User Name is ".$_COOKIE["user_name"]."')</script>";
+  	//echo "<script>alert('User Name is ".$_COOKIE["user_name"]."')</script>";
   	
   	
   	// finish saving 
