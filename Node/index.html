@@ -1,0 +1,264 @@
+<html>
+	<head>
+	
+	    <title> Draw </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+
+		<!-- JQuery -->
+		<!--<script src="../jquery.min.js"></script>  -->
+		<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
+		<script src="http://code.jquery.com/jquery.js"></script>
+	
+
+		<!-- Bootstrap -->
+		<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+		
+       	
+        <!-- socket.io -->
+		<script src="/socket.io/socket.io.js"></script>
+
+
+
+	</head>
+	<body>
+	
+	
+		<style type="text/css">
+		
+			html, body{
+				width:100%;
+				height:100%;
+				margin:0;
+				padding:0;
+				background-color: white;
+			}
+			
+			#information_div{
+				background-color: #25abb9;
+				position: absolute;
+				height: 100%;
+				width: 30%;
+				left: 70%;
+				top:0%;
+			}
+			
+			#painting_canvas{
+				position: absolute;
+				width: 90%;
+				left: 5%;
+				height: 90%;
+				top:5%;
+				
+			}
+			
+			#draw_div{
+				background-color: #953939;
+				position: absolute;
+				height: 100%;
+				width: 70%;
+				left: 0%;
+				top:0%;
+			}
+			
+			#chat_information{
+				position: absolute;
+				height: 40%;
+				width: 100%;
+				top:0%;
+				left: 0%
+			}
+			
+			#chat_content{
+				background-color: #f493e5;
+				position: absolute;
+				height: 60%;
+				width: 100%;
+				top:40%;
+				left: 0%;
+			}	
+			
+			#chat_area{
+				height: 80%;
+				width: 80%;
+			}
+			
+			#alert_area{
+				position:absolute;
+				width: 50%;
+				height:10%;
+				
+				left: 30%;
+				top:5%;
+			}
+		</style>
+		
+		<div id="draw_div">
+			<!--
+			<iframe src="./content.html" id="painting_canvas">
+			
+			
+			</iframe>
+			-->
+			
+		</div>
+		<div id="information_div">
+			<iframe id="hidden_iframe" style="display:none"></iframe>
+			
+			<div id="chat_information">
+				<h2> Chat Information </h2>
+			            	<h4 id="online_num"> Online: 0 </h4>
+		     				<h4> &nbsp;&nbsp;&nbsp;&nbsp; send message </h4>
+							<input name="postit" id="postit" type="text">
+							<button class="btn btn-primary" type="submit" id="submit">Send Message</button>	
+							<button class="btn btn-primary" id="show_user_information">User Information</button>
+							
+			</div>
+			<div id="chat_content">
+				<h2> Chat Content </h2>
+				<textarea id="chat_area" readonly="">Initializing .... </textarea>
+			</div>
+			
+			<div class="alert" id="alert_area"> 
+				<a class="close" onclick="$('.alert').hide()"> × </a>  
+				<strong>Message!  </strong> 
+				<p id="alert_message" style="position:absolute;top:30%;"> Now initializing app </p>
+			</div>
+			
+		</div>
+			
+		<script>
+
+				$(document).ready(function(){
+				
+			    var user_name="null";		
+
+				
+					$("#postit").keypress(function(e){
+					// e.which = 13 -> Enter
+					if(e.which == 13){
+						socket.emit('my event' ,user_name+": "+$("#postit").val());
+						$("#postit").val("");
+					}
+						
+				});
+				
+
+
+
+				var send_message="";
+		
+				var socket = io.connect();
+				
+				var previous_online_num=0;
+								
+								
+				// has_same_user_name
+				socket.on('has_same_user_name',function(data){
+					var has_same_user_name=data[0];
+					user_name=data[1];
+					
+					if(has_same_user_name){
+						user_name = prompt("User "+user_name+" already existed\n"+"Enter your chat name:", "Guest");
+						socket.emit('sent_custom_name',user_name);
+					}
+					else{
+						
+						$("#chat_area").html("Successfully Connected");
+						socket.emit("add_one_online_user",user_name);
+						
+						previous_online_num=data.now_online_user_num;
+						
+						// show successfully init
+						$(".alert").show();
+						$("#alert_message").html("Welcome "+user_name+"\nYou are now online");
+						
+						setTimeout(function(){
+								
+								$(".alert").hide();
+								
+								
+							}, 3000);
+						}
+				})
+				
+				socket.on('init',function(data){
+					console.log("Init");
+					
+					user_name = prompt("Enter your chat name:", "Guest");
+				
+					socket.emit('sent_custom_name',user_name);
+						
+				});
+				
+				socket.on('update_online_user_num',function(data){
+					var now_online=data[0];
+					var new_user_name=data[1];
+					if(now_online>previous_online_num){
+						// show successfully init
+						$(".alert").show();
+						$("#alert_message").html("One new user "+new_user_name+" now online");
+						
+						setTimeout(function(){
+							$(".alert").hide();
+							
+						}, 5000);
+					}
+					
+					if(now_online<previous_online_num){
+						// show successfully init
+						$(".alert").show();
+						$("#alert_message").html("User "+new_user_name+" now offline");
+						
+						setTimeout(function(){
+							$(".alert").hide();
+						}, 5000);
+					}
+					
+					previous_online_num=now_online;
+					
+					$('#online_num').html('Online: '+now_online);
+				});
+				
+				socket.on('update_textarea',function(user_message){
+					$("#chat_area").html(user_message);
+				});
+				
+				$("#submit").click(function() {
+                    socket.emit('my event' ,user_name+": "+$("#postit").val());
+                    $("#postit").val("");
+                })
+				
+				
+				
+                $("#show_user_information").click(function(){
+					
+					socket.emit('request_for_user_information',null);
+					
+				})
+				
+				socket.on('return_user_information',function(user_name_array){
+					var name_string="Now online users: \n";
+					for(var i=0;i<user_name_array.length;i++){
+						name_string+=user_name_array[i];
+						name_string+="\n";
+					}
+					alert(name_string);
+				});
+				
+
+					
+				})
+								
+				
+				
+						
+			
+			
+			
+			
+		</script>
+	
+	
+	</body>
+</html>

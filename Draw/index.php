@@ -44,6 +44,24 @@
 				top:0%;
 			}
 			
+			#painting_canvas{
+				position: absolute;
+				width: 90%;
+				left: 5%;
+				height: 90%;
+				top:5%;
+				
+			}
+			
+			#draw_div{
+				background-color: #953939;
+				position: absolute;
+				height: 100%;
+				width: 70%;
+				left: 0%;
+				top:0%;
+			}
+			
 			#chat_information{
 				position: absolute;
 				height: 40%;
@@ -66,6 +84,13 @@
 				width: 80%;
 			}
 		</style>
+		<div id="draw_div">
+			<iframe src="./content.html" id="painting_canvas">
+			
+			
+			</iframe>
+			
+		</div>
 		<div id="information_div">
 			<iframe id="hidden_iframe" style="display:none"></iframe>
 			
