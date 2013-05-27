@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset=utf-8>
+        <title>HTML5 Demo: ContentEditable</title>
+		<script src="http://code.jquery.com/jquery.js"></script>
+		
+		<style>
+			html,body{
+				width: 1024px;
+				height: 768px;
+			}
+			#code_area{
+				
+				height: 768px;
+				width: 1024px;
+				font-size: 15pt;
+				position: absolute;
+				color:rgba(255,255,255,0.4);
+				left: 0px;
+				top: 0px;
+
+			}
+			
+			.curser{
+				color: rgba(255,255,255,0);
+			}
+			#code_show{
+				background-color: black;
+				color: white;
+				position: absolute;
+				height: 768px;
+				width: 100%;
+				font-size: 15pt;
+				left: 0px;
+				top: 0px;
+			}
+		</style>
+    </head>
+    <body>
+   		
+   		<p id="code_show"></p>   		
+      	<p id="code_area"  contenteditable="true" ></p>
+        
+		<script>
+			
+			var whole_content="";
+			
+			// code_show and code_area have same postion and size
+			
+			$("body").on("keyup ",function(e){
+				//alert("pressed");
+				var keycode=e.which||e.keyCode;
+				var word=String.fromCharCode(keycode);
+				console.log(keycode+" : "+word);
+
+				/*
+				// press enter
+				if(keycode==13){
+					console.log("Press Enter");
+					//$("#code_area").append("<br/>");
+					whole_content+="<br/>";
+				}
+				// press tab
+				else if(keycode==9){
+					whole_content+="    ";	
+				}
+				
+				else if(keycode==8){
+					whole_content=whole_content.substr(0, whole_content.length-1);
+					//$("#code_area").html(whole_content);
+				}
+				else{
+					whole_content+=word;
+					if(word=="a"){
+						whole_content+="<span style='color:green'>def</span>";
+					}
+					//whole_content=whole_content.replace("def", "<span style='color:green'>def</span>");
+					
+					//$("#code_area").html(whole_content);
+					console.log("===="+whole_content);
+					$("#id").html(whole_content);
+					//$("#code_area").html(whole_content);
+				}
+				*/
+				
+				whole_content=$("#code_area").html();
+				console.log(whole_content);
+			
+				whole_content=whole_content.replace("def","<span style='color:purple'>def</span>");
+				whole_content=whole_content.replace("for","<span style='color:purple'>for</span>");
+				whole_content=whole_content.replace("while","<span style='color:purple'>while</span>");
+				whole_content=whole_content.replace("elif","<span style='color:purple'>elif</span>");
+				whole_content=whole_content.replace("if","<span style='color:purple'>if</span>");
+				whole_content=whole_content.replace("else","<span style='color:purple'>else</span>");
+
+				whole_content=whole_content.replace("then","<span style='color:green'>then</span>");
+				whole_content=whole_content.replace("end","<span style='color:green'>end</span>");
+
+				
+				$("#code_show").html(whole_content);
+				
+			});
+			
+		</script>
+	</body>
+</html>

@@ -22,12 +22,12 @@ function myBalance(formulaStr) {
 // Balances the given formula string and sets the HTML output on the page. Returns nothing.
 function balance(formulaStr) {
     // Clear output
-    setMessage("");
+    //setMessage("");
     var balancedElem = document.getElementById("balanced");
     var codeOutElem = document.getElementById("codeOutput");
-    removeAllChildren(balancedElem);
-    removeAllChildren(codeOutElem);
-    appendText(" ", codeOutElem);
+    //removeAllChildren(balancedElem);
+    //removeAllChildren(codeOutElem);
+    //appendText(" ", codeOutElem);
 
     // Parse equation
     var eqn;
@@ -35,11 +35,14 @@ function balance(formulaStr) {
         eqn = parse(formulaStr);
     } catch (e) {
         if (typeof e == "string") {  // Simple error message string
-            setMessage("Syntax error: " + e);
+            //setMessage("Syntax error: " + e);
+            $('#message').html("Syntax error: " + e.message);
 
         } else if ("start" in e) {  // Error message object with start and possibly end character indices
-            setMessage("Syntax error: " + e.message);
-
+            //setMessage("Syntax error: " + e.message);
+            $('#message').html("Syntax error: " + e.message);
+            
+            /*
             var start = e.start;
             var end = "end" in e ? e.end : e.start;
             while (end > start && (formulaStr.charAt(end - 1) == " " || formulaStr.charAt(end - 1) == "\t"))
@@ -57,9 +60,10 @@ function balance(formulaStr) {
                 appendText(" ", highlight);
                 codeOutElem.appendChild(highlight);
             }
+            */
 
         } else {
-            setMessage("Assertion error");
+            $('#message').html("Assertion error");
         }
         return;
     }
@@ -68,11 +72,13 @@ function balance(formulaStr) {
         var matrix = buildMatrix(eqn);                // Set up matrix
         solve(matrix);                                // Solve linear system
         var coefs = extractCoefficients(matrix);      // Get coefficients
+        //alert(coefs);
         checkAnswer(eqn, coefs);                      // Self-test, should not fail
-        balancedElem.appendChild(eqn.toHtml(coefs));  // Display balanced equation
-
+        
+        //alert('here --> '+eqn.toHtml(coefs));
+        $('#balanced').html(eqn.toHtml(coefs));
     } catch (e) {
-        setMessage(e.toString());
+        $('#message').html(e.toString());
     }
 }
 

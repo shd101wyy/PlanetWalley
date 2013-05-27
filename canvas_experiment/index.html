@@ -1,0 +1,374 @@
+
+<html>
+	<head>
+	    <meta charset="utf-8">
+
+		<title> canvas experiment </title>
+		
+		
+		<style>
+			html,body{
+				width: 100%;
+				height: 100%;
+			}
+			 #connect_to_server{position: absolute;left: 50%;top:50%;}
+		     #container { width: 90%; height: 100%; position: absolute;left: 0%; top:0%;}
+		     #imageView { border: 1px solid #000; position: absolute; cursor: crosshair;}
+		     #draw_tool {position: absolute; height: 100%; width: 10%; left: 90%; top:0%;background:#e1dada;}
+		     #full_color_picker {position: absolute; width: 90%; left: 5%;top:0%;}
+		
+		
+		</style>
+		
+		<!-- socket.io -->
+		<script src="/socket.io/socket.io.js"></script>
+		<!-- jquery -->
+		<script src="http://code.jquery.com/jquery.js"></script>
+		<!-- spectrum color picker -->
+		<link rel="stylesheet" type="text/css" href="http://bgrins.github.com/spectrum/spectrum.css">
+		<script type="text/javascript" src="http://bgrins.github.com/spectrum/spectrum.js"></script>
+
+	
+	</head>
+		
+	<body>
+		<div id='container'>
+			<!-- <p id="connect_to_server" > Connecting to server ... </p> -->
+			<canvas id='imageView'>
+			</canvas>
+		
+			
+		</div>
+		<p id='connect_to_server'> Connecting to server .. please wait </p>
+		<div id='draw_tool'>
+			<button id='clean_screen'>clean</button>
+			<div id='color_pick_area'>
+				<p> color </p>
+				<input type='text' id="full_color_picker"/>
+			</div>
+			<p> stroke width </p>
+			<input type="text" id='line_width' value="1" width="90%"/>
+		</div>
+	
+		<script>
+				
+		  var canvas, context, tool;
+		  
+		  var started=false;
+		  
+		  var socket = io.connect();
+		  
+		  var connected_to_server=false;
+		  
+		  var my_id;
+		  
+		  var last_x;
+		  var last_y;
+		  
+		  var is_touch_device=false;
+		  
+		  var mouse_touch_position_x=[];
+		  var mouse_touch_position_y=[];
+		  
+		  var draw_color='#20124d';
+
+		  
+		  // init color picker
+		  $("#full_color_picker").spectrum({
+			    color: "#ECC",
+			    showInput: true,
+			    className: "full-spectrum",
+			    //showInitial: true,
+			    showPalette: true,
+			    showSelectionPalette: true,
+			    maxPaletteSize: 10,
+			    preferredFormat: "hex",
+			    localStorageKey: "spectrum.demo",
+			    showAlpha: true,
+			    move: function (color) {
+			         			    },
+			    show: function () {
+			    
+			    },
+			    beforeShow: function () {
+			    
+			    },
+			    hide: function () {
+			    
+			    },
+			    change: function(color) {
+			        draw_color=color.toHexString(); // #ff0000
+			        console.log('here --> '+draw_color);
+			    },
+			    palette: [
+			        ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",
+			        "rgb(204, 204, 204)", "rgb(217, 217, 217)","rgb(255, 255, 255)"],
+			        ["rgb(152, 0, 0)", "rgb(255, 0, 0)", "rgb(255, 153, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)",
+			        "rgb(0, 255, 255)", "rgb(74, 134, 232)", "rgb(0, 0, 255)", "rgb(153, 0, 255)", "rgb(255, 0, 255)"], 
+			        ["rgb(230, 184, 175)", "rgb(244, 204, 204)", "rgb(252, 229, 205)", "rgb(255, 242, 204)", "rgb(217, 234, 211)", 
+			        "rgb(208, 224, 227)", "rgb(201, 218, 248)", "rgb(207, 226, 243)", "rgb(217, 210, 233)", "rgb(234, 209, 220)", 
+			        "rgb(221, 126, 107)", "rgb(234, 153, 153)", "rgb(249, 203, 156)", "rgb(255, 229, 153)", "rgb(182, 215, 168)", 
+			        "rgb(162, 196, 201)", "rgb(164, 194, 244)", "rgb(159, 197, 232)", "rgb(180, 167, 214)", "rgb(213, 166, 189)", 
+			        "rgb(204, 65, 37)", "rgb(224, 102, 102)", "rgb(246, 178, 107)", "rgb(255, 217, 102)", "rgb(147, 196, 125)", 
+			        "rgb(118, 165, 175)", "rgb(109, 158, 235)", "rgb(111, 168, 220)", "rgb(142, 124, 195)", "rgb(194, 123, 160)",
+			        "rgb(166, 28, 0)", "rgb(204, 0, 0)", "rgb(230, 145, 56)", "rgb(241, 194, 50)", "rgb(106, 168, 79)",
+			        "rgb(69, 129, 142)", "rgb(60, 120, 216)", "rgb(61, 133, 198)", "rgb(103, 78, 167)", "rgb(166, 77, 121)",
+			        "rgb(91, 15, 0)", "rgb(102, 0, 0)", "rgb(120, 63, 4)", "rgb(127, 96, 0)", "rgb(39, 78, 19)", 
+			        "rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
+			    ]
+			});
+
+		  
+	      socket.on('begin_to_connect_to_server',function(data){
+		      console.log(data.message);
+		      my_id=data.id;
+		      console.log('My id -->'+data.id);
+		      
+		      connected_to_server=true;
+		      
+		      //$('#connect_to_server').css('visibility','hidden');
+		      $('#connect_to_server').html('Connected to server.. Enjoy!');
+		      
+		      setTimeout(function(){
+		      	$('#connect_to_server').css('visibility','hidden');
+		      }, 5000);
+		      
+		     	// init app; 
+		      init();
+		      
+		      // restore saved data
+		      var saved_data=data.saved_data;
+		      for(var i in saved_data){
+			      drawLine(context,saved_data[i].pos.last_x,saved_data[i].pos.last_y,saved_data[i].pos.x,saved_data[i].pos.y,saved_data[i].draw_color,saved_data[i].line_width);
+		      }
+
+	      });
+	      
+	      
+	      // clean screen
+	      $('#clean_screen').click(function(){
+		      context.clearRect(0, 0, canvas.width, canvas.height);
+		      
+	      });
+	     	      
+	      
+	      
+	  	  function init () {
+	  	    // Find the canvas element.
+		    canvas = document.getElementById('imageView');
+		    canvas.width=document.getElementById('container').offsetWidth;//scrollWidth;
+		    canvas.height=document.getElementById('container').offsetHeight;//scrollHeight;
+		    
+		    if (!canvas) {
+		      alert('Error: I cannot find the canvas element!');
+		      return;
+		    }
+		
+		    if (!canvas.getContext) {
+		      alert('Error: no canvas.getContext!');
+		      return;
+		    }
+		
+		    // Get the 2D canvas context.
+		    context = canvas.getContext('2d');
+		    if (!context) {
+		      alert('Error: failed to getContext!');
+		      return;
+		    }
+		    
+		    		
+		    // init default color
+		    context.strokeStyle=draw_color;
+		    
+		    // check whether is touch device
+		    is_touch_device='ontouchstart' in document.documentElement;
+		   	
+		   	
+		   	// is touch device
+		   	if(is_touch_device){
+		   		alert('It is touch device :)');
+			   	  // Attach the mousedown, mousemove and mouseup event listeners.
+			    canvas.addEventListener('touchstart', ev_mousedown, false);
+			    canvas.addEventListener('touchmove', ev_mousemove, false);
+			    canvas.addEventListener('touchend',   ev_mouseup, false);
+			    
+			    // prevent elastic scrolling
+			    canvas.addEventListener('touchmove',function(event){event.preventDefault();},false);
+		   	}	
+		   	
+		   	else{
+			  
+			    // Attach the mousedown, mousemove and mouseup event listeners.
+			   			    
+			    canvas.addEventListener('mousedown', ev_mousedown, false);
+			    canvas.addEventListener('mousemove', ev_mousemove, false);
+			    canvas.addEventListener('mouseup',   ev_mouseup, false);
+
+			}
+		  }
+		
+		  function getMouseOrTouchPos(canvas, evt) {            
+		  	 
+	          // get touch position of touch device
+			  if(is_touch_device){
+			  	  evt.preventDefault();
+			  	  len=evt.targetTouches.length;
+			  	  
+			  	  for (i = 0; i < len; i++) {
+				  	   mouse_touch_position_x[i] = evt.targetTouches[i].pageX -  canvas.offsetLeft;
+				  	   mouse_touch_position_y[i] = evt.targetTouches[i].pageY -  canvas.offsetTop;
+				  }
+			  				  	  
+		  	  }
+		  	  // get mouse click position
+		  	  else{
+			  	  
+			  	  if (evt.layerX || evt.layerX == 0) { // Firefox
+				      mouse_touch_position_x[0] = evt.layerX;
+				      mouse_touch_position_y[0] = evt.layerY;
+				  } else if (evt.offsetX || evt.offsetX == 0) { // Opera
+				      mouse_touch_position_x[0] = evt.offsetX;
+				      mouse_touch_position_y[0] = evt.offsetY;
+				  }
+				  
+				  
+		  	  }	        
+	        
+	      }
+
+		
+		  function ev_mousedown(ev){
+		  
+		  	  var x,y;
+		  	  getMouseOrTouchPos(canvas,ev);
+		  	  // get touch position of touch device
+		  	  if(is_touch_device){
+			  	  x=mouse_touch_position_x[0];
+			  	  y=mouse_touch_position_y[0];			  	  
+		  	  }
+		  	  // get mouse click position
+		  	  else{
+				 x=mouse_touch_position_x[0];
+			  	 y=mouse_touch_position_y[0];	
+		  	  }
+			 
+
+			
+	          started = true;
+	          
+	          last_x=x, last_y=y;
+	          
+	          
+	          
+	          
+		  }
+		  
+      
+		  function ev_mousemove(ev){
+		  			  		
+
+		  	  var x,y;
+		  	  getMouseOrTouchPos(canvas,ev);
+		  	  // get touch position of touch device
+		  	  if(is_touch_device){
+			  	  x=mouse_touch_position_x[0];
+			  	  y=mouse_touch_position_y[0];			  	  
+		  	  }
+		  	  // get mouse click position
+		  	  else{
+				 x=mouse_touch_position_x[0];
+			  	 y=mouse_touch_position_y[0];	
+		  	  }
+			 		 	
+			  
+			  if(started){
+				  //context.lineTo(ev._x, ev._y);
+		          //context.stroke();		   
+		         
+		         // get stroke width
+		          var line_width=$('#line_width').val();
+		           
+		          // local user draw
+		          drawLine(context,last_x,last_y,x,y,draw_color,line_width);
+		         
+		          // update draw data to server
+		          socket.emit('mouse_move',{pos:{x:x,y:y,last_x:last_x,last_y:last_y},
+		          							id:my_id,
+		          							draw_color:draw_color,
+		          							line_width:line_width});
+
+
+		          // update last position
+		          last_x=x;
+		          last_y=y;		          
+
+			  }
+			  
+			  
+			  
+			 // console.log(ev._x);
+			 // console.log(ev._y);
+
+			  
+		  }
+		  
+		  function ev_mouseup(ev){
+			  
+		  		if(started){
+			  		ev_mousemove(ev);
+			  		started=false;
+		  		}
+		  
+		  }
+		  
+		  // context, last_x, last_y, current_x, current_y, color,
+		  function drawLine(context, x1,y1,x2,y2, draw_color, line_width){
+		  	  if(typeof(draw_color)=='undefined')
+		  	  	draw_color='#000000';
+		  	  if(typeof(line_width)=='undefined')
+		  	  	line_width=1;
+		  	  
+			  context.beginPath();
+			  context.moveTo(x1,y1);
+			  context.lineTo(x2,y2);
+			  context.strokeStyle=draw_color;
+			  context.lineWidth=line_width;
+			  context.stroke();
+			  
+		  }
+		  
+		  
+		   // {{x:..,y:..},{x:.., y:..}}
+		  function draw_according_to_pos(draw_data){
+		  
+		  	 var context=canvas.getContext('2d');
+			 var begin_pos=draw_data[0];
+			 context.beginPath();
+			 context.moveTo(begin_pos.x,begin_pos.y);
+			 
+			 for(var i=1;i<draw_data.length; i++){
+				 context.lineTo(draw_data[i].x,draw_data[i].y);
+			     context.stroke();		   
+
+			 }
+		  }
+		  
+		  socket.on('remote_mouse_move',function(data){
+		  	  console.log('remote_mouse_move');
+		  	  console.log('last -> '+data.pos.last_x +'  '+data.pos.last_y);
+		  	  console.log('now  -> '+data.pos.x+'  '+ data.pos.y);
+			  drawLine(context, data.pos.last_x, data.pos.last_y, data.pos.x, data.pos.y, data.draw_color, data.line_width);
+		  });
+
+				  				  
+		  
+		  
+	   
+					
+		</script>
+	
+	</body>
+
+
+
+</html>

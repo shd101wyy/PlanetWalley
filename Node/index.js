@@ -22,10 +22,16 @@ var online_user=0;
 var user_message="Successfully Connected\n";
 
 var usr_name_array=new Array();
+var user_name_id_array=new Array();
+
 var my_user_name="null";
+
+var leaving_user_name="null";
 
 io.sockets.on('connection', function (socket) {
    // join public room
+   
+   console.log("Init Server");
    
    socket.join('public_room');
 
@@ -51,22 +57,36 @@ io.sockets.on('connection', function (socket) {
    });
    
    // request_for_user_information
-   
    socket.on('request_for_user_information',function(data){
 	  	socket.emit('return_user_information',usr_name_array); 
    });
    
    // user disconnect
    socket.on("disconnect", function(s) {
+   		console.log("user id "+socket.id+" is leaving");
         online_user--;
-        io.sockets.emit('update_online_user_num',[online_user,my_user_name]);
+        
+        // remove user_name from user_name_array;
+       	for(var i=0;i<user_name_id_array.length;i++){
+	       	if(user_name_id_array[i]==socket.id){
+	       		console.log("remove "+usr_name_array[i]+" from user information");
+	       		
+	       		io.sockets.emit('update_online_user_num',[online_user,usr_name_array[i]]);
+
+		       	usr_name_array.splice(i, 1);
+		       	user_name_id_array.splice(i,1);
+		       	break;
+	       	}
+       	} 
+
+               	
         console.log("User disconnected from global handler");
     });
-   
+       
     // get user name from client
     socket.on('sent_custom_name',function(user_name){
 	    console.log("Get user name --> "+user_name);
-	    
+	    console.log(socket.id);
 	    // check whether same user existed.
 	    var has_same_user_name=false;
 	    for(var i=0;i<usr_name_array.length;i++){
@@ -78,6 +98,7 @@ io.sockets.on('connection', function (socket) {
 	    }
 	    if(has_same_user_name==false){
 	    	usr_name_array.push(user_name);
+	    	user_name_id_array.push(socket.id);
 	    	my_user_name=user_name;
 	    	}
 	    socket.emit('has_same_user_name',[has_same_user_name,user_name]);
