@@ -1,0 +1,241 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  font-family: Tahoma, Helvetica, Arial, "Microsoft Yahei","微软雅黑", STXihei, "华文细黑", sans-serif;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+html {
+  transition: background-color 6s ease-in-out;
+  background-color: #5ab7e5;
+}
+
+h1, h2, h3, p {
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.background-blue-gradient {
+  background-image: linear-gradient(to bottom, #5ab7e5 0, #4196C0 100%);
+}
+
+.background-orange {
+  transition: background-color 6s ease-in-out;
+  background-color: #E5C143;
+}
+
+.background-orange-gradient {
+  background-image: linear-gradient(to bottom, #E5C143 0, #E99A54 100%);
+}
+
+.background-black {
+  background-color: #4f4f4f;
+}
+
+.background-black-gradient {
+  background-image: linear-gradient(to bottom, #4f4f4f 0, #151515 100%);
+}
+
+#app {
+  margin: 0;
+}
+
+.construction-page {
+  color: white;
+  text-align: center;
+  padding: 0 10px;
+
+  h1 {
+    margin-top: 200px;
+  }
+
+  .count-down {
+    margin-top: 250px;
+    font-size: 40px;
+
+    @media only screen and (max-device-width: 480px) {
+      margin-top: 100px;
+      font-size: 22px;
+    }
+  }
+
+  .input-box {
+    width: 420px;
+    height: 40px;
+    padding-left: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border-style: none;
+
+    @media only screen and (max-device-width: 480px) {
+      width: 90%;
+      margin-bottom: 10px;
+    }
+  }
+
+  .enter {
+    height: 40px;
+    border-radius: 6px;
+    margin-left: 15px;
+    color: #fff;
+    font-size: 14px;
+    border: 1px solid #fff;
+    background-color: rgba(71, 132, 185, 0);
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #2e7599;
+    }
+  }
+
+  .sunflower-img {
+    width: 250px;
+  }
+}
+
+.formal-page {
+  color: white;
+  text-align: center;
+  padding: 0 100px;
+
+  @media only screen and (max-device-width: 480px) {
+    padding: 0 10px;
+  }
+
+  h1 {
+    margin-top: 200px;
+
+    @media only screen and (max-device-width: 480px) {
+      margin-top: 100px;
+      font-size: 22px;
+    }
+  }
+
+  .hint {
+    margin-left: 400px;
+    margin-top: 80px;
+    font-size: 16px;
+
+    .desktop {
+      display: inline-block;
+    }
+
+    .mobile {
+      display: none;
+    }
+
+    @media only screen and (max-device-width: 480px) {
+      margin-left: 10px;
+      font-size: 11px;
+      content: 'hi';
+
+      .desktop {
+        display: none;
+      }
+
+      .mobile {
+        display: inline-block;
+      }
+    }
+  }
+
+  .email-content {
+    width: 360px;
+    height: 40px;
+    border-radius: 6px;
+    border-style: none;
+    padding-left: 10px;
+    font-size: 15px;
+    color: #555;
+
+    @media only screen and (max-device-width: 480px) {
+      width: 90%;
+      margin-bottom: 10px;
+    }
+  }
+
+  .send-email-btn {
+    width: 66px;
+    height: 40px;
+    margin-left: 15px;
+    border-radius: 6px;
+    font-size: 15px;
+    color: white;
+    border: 1px solid #fff;
+    background-color: rgba(71, 132, 185, 0);
+    cursor: pointer;
+
+    &:hover {
+      background-color: #e28630;
+    }
+  }
+
+  .signature {
+    margin-top: 250px;
+    font-family: cursive;
+    font-size: 20px;
+    color: #FFFFFF;
+
+    @media only screen and (max-device-width: 480px) {
+      margin-top: 100px;
+    }
+  }
+
+  .thanks {
+    font-family: cursive;
+    font-size: 20px;
+    color: #FFFFFF;
+    height: 100%;
+    overflow-y: auto;
+
+    h2.thank-name {
+      margin-top: 10px;
+
+      @media only screen and (max-device-width: 480px) {
+        font-size: 16px;
+      }
+    }
+
+    h1.thank-end {
+      margin-bottom: 500px;
+
+      @media only screen and (max-device-width: 480px) {
+        margin-top: 200px;
+        margin-bottom: 250px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .image-text {
+    img {
+      max-height: 500px;
+      margin-top: 30px;
+      // cursor: pointer;
+
+      @media only screen and (max-device-width: 480px) {
+        max-height: 400px;
+        max-width: 300px;
+      }
+    }
+
+    .text {
+      margin-top: 30px;
+    }
+  }
+}
+
+.page-404 {
+  height: 100%;
+  background: white;
+  text-align: center;
+}
