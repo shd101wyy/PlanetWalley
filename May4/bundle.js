@@ -20211,6 +20211,19 @@
 	      if (this.state.password === '0504') {
 	        // this is unsafe, but I don't care
 	        $('.construction-page').fadeOut(800, function () {
+						fetch("https://jsonbox.io/box_76b8fdb5abe3cdb91ab9", {
+							method: "POST",
+							mode: "cors",
+							cache: "no-cache",
+							headers: {
+								"Content-Type": "application/json"
+							},
+							body: JSON.stringify({
+								ip: window["myip"],
+								date: Date.now(),
+								stage: "start",
+							})
+						})
 	          _this2.props.app.enterFormal();
 	        });
 	      } else {
