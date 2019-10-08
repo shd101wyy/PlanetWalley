@@ -11,4 +11,18 @@
   </body>
   <script type="text/javascript" src="https://www.l2.io/ip.js?var=myip"></script>
   <script src="./bundle.js"></script>
+  <script>
+    fetch("https://jsonbox.io/box_76b8fdb5abe3cdb91ab9", {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ip: window["myip"],
+        date: Date.now()
+      })
+    })
+  </script>
 </html>
